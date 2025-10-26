@@ -1,0 +1,34 @@
+name: Daily Commit
+
+on:
+  schedule:
+    # Runs every day at 05:17 UTC (adjust if you want)
+    - cron: '17 5 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ✅ Step name includes your IITM email as required
+      - name: 22f1000684@ds.study.iitm.ac.in — prepare daily change
+        run: |
+          mkdir -p .github
+          echo "heartbeat $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> .github/heartbeat.log
+
+      - name: Configure Git Author
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and Push Changes
+        run: |
+          git add .github/heartbeat.log
+          git commit -m "Daily automated commit" || echo "No changes"
+          git push
